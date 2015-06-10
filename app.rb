@@ -6,16 +6,17 @@ Bundler.require
 # Setup DataMapper with a database URL. On Heroku, ENV['DATABASE_URL'] will be
 # set, when working locally this line will fall back to using SQLite in the
 # current directory.
-DataMapper.setup(:default, ENV['DATABASE_URL'] || "sqlite://#{Dir.pwd}/development.sqlite")
+env = ENV['RACK_ENV'] || 'development'
+DataMapper.setup(:default, ENV['DATABASE_URL'] || "postgres://localhost/chitter_api_#{env}")
 
 # Define a simple DataMapper model.
-class Thing
+class Peep
   include DataMapper::Resource
 
-  property :id, Serial, :key => true
+  property :id, Serial
+  property :message, String, :length => 1..140
   property :created_at, DateTime
-  property :title, String, :length => 255
-  property :description, Text
+
 end
 
 # Finalize the DataMapper models.
@@ -28,16 +29,16 @@ get '/' do
   send_file './public/index.html'
 end
 
-# Route to show all Things, ordered like a blog
-get '/things' do
+# Route to show all peeps, ordered like a blog
+get '/peeps' do
   content_type :json
-  @things = Thing.all(:order => :created_at.desc)
+  @peeps = Peep.all(:order => :created_at.desc)
 
-  @things.to_json
+   @peeps.to_json
 end
 
-# CREATE: Route to create a new Thing
-post '/things' do
+# CREATE: Route to create a new peep
+post '/peeps' do
   content_type :json
 
   # These next commented lines are for if you are using Backbone.js
@@ -47,29 +48,29 @@ post '/things' do
 
   # If you are using jQuery's ajax functions, the data goes through in the
   # params.
-  @thing = Thing.new(params)
+  @peep = Peep.new(params)
 
-  if @thing.save
-    @thing.to_json
+  if @peep.save
+    @peep.to_json
   else
     halt 500
   end
 end
 
-# READ: Route to show a specific Thing based on its `id`
-get '/things/:id' do
+# READ: Route to show a specific peep based on its `id`
+get '/peeps/:id' do
   content_type :json
-  @thing = Thing.get(params[:id].to_i)
+  @peep = Peep.get(params[:id].to_i)
 
-  if @thing
-    @thing.to_json
+  if @peep
+    @peep.to_json
   else
     halt 404
   end
 end
 
-# UPDATE: Route to update a Thing
-put '/things/:id' do
+# UPDATE: Route to update a peep
+put '/peeps/:id' do
   content_type :json
 
   # These next commented lines are for if you are using Backbone.js
@@ -80,30 +81,30 @@ put '/things/:id' do
   # If you are using jQuery's ajax functions, the data goes through in the
   # params.
 
-  @thing = Thing.get(params[:id].to_i)
-  @thing.update(params)
+  @peep = Peep.get(params[:id].to_i)
+  @peep.update(params)
 
-  if @thing.save
-    @thing.to_json
+  if @peep.save
+    @peep.to_json
   else
     halt 500
   end
 end
 
-# DELETE: Route to delete a Thing
-delete '/things/:id/delete' do
+# DELETE: Route to delete a peep
+delete '/peeps/:id/delete' do
   content_type :json
-  @thing = Thing.get(params[:id].to_i)
+  @peep = Peep.get(params[:id].to_i)
 
-  if @thing.destroy
+  if @peep.destroy
     {:success => "ok"}.to_json
   else
     halt 500
   end
 end
 
-# If there are no Things in the database, add a few.
-if Thing.count == 0
-  Thing.create(:title => "Test Thing One", :description => "Sometimes I eat pizza.")
-  Thing.create(:title => "Test Thing Two", :description => "Other times I eat cookies.")
+# If there are no peeps in the database, add a few.
+if Peep.count == 0
+  Peep.create(:message => "Test peep One")
+  Peep.create(:message => "Test peep Two")
 end
