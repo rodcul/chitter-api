@@ -25,6 +25,11 @@ DataMapper.finalize
 # Tell DataMapper to update the database according to the definitions above.
 DataMapper.auto_upgrade!
 
+# To enable cross origin requests for all routes:
+configure do
+  enable :cross_origin
+end
+
 get '/' do
   send_file './public/index.html'
 end
