@@ -26,11 +26,6 @@ DataMapper.finalize
 DataMapper.auto_upgrade!
 
 # To enable cross origin requests for all routes:
-configure do
-  enable :cross_origin
-end
-
-set :allow_origin, :any
 
 get '/' do
   send_file './public/index.html'
