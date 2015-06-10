@@ -7,11 +7,11 @@
     $(document).ready(function () {
       // Load THINGS data immediately
       $.ajax({
-        url: '/things',
+        url: '/peeps',
         method: 'GET'
       }).done(function (data) {
         data.forEach(function (d) {
-          $('#things-index').append("<p><strong>" + d.title + "</strong>: " + d.description + "</p>");
+          $('#peeps-index').append("<p><strong>" + d.message + "</strong>: </p>");
         });
       });
 
@@ -20,11 +20,10 @@
         var data = {};
 
         // Get the data from the form elements
-        data.title = $('#new-title').val();
-        data.description = $('#new-description').val();
+        data.message = $('#new-message').val();
 
         $.ajax({
-          url: '/things',
+          url: '/peeps',
           method: 'POST',
           data: data
         }).done(function (response) {
@@ -38,18 +37,15 @@
   </script>
 </head>
 <body>
-  <div id="things-index">
-    <h2>All Things</h2>
+  <div id="peeps-index">
+    <h2>All Peeps</h2>
   </div>
 
 
-  <h2>New Thing</h2>
-  <form id="new-thing">
+  <h2>New Peep</h2>
+  <form id="new-peep">
     <p><strong>Title:</strong></p>
-    <input id="new-title" name="title" type="text">
-
-    <p><strong>Description:</strong></p>
-    <textarea id="new-description" name="description"></textarea>
+    <input id="new-message" name="message" type="text">
 
     <p><input id="new-submit" type="submit"></p>
   </form>
